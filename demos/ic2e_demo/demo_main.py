@@ -67,7 +67,7 @@ def parse_ts(tagset_names, ts_dir):
     for ts_name in tqdm(tagset_names):
             ts_path = ts_dir + '/' + ts_name
             with open(ts_path, 'r') as stream:
-                tagset = yaml.load(stream)
+                tagset = yaml.load(stream, Loader=yaml.Loader)
             if 'labels' in tagset:
                 # Multilabel changeset
                 labels.append(tagset['labels'])
@@ -157,7 +157,7 @@ def iterative_experiment(train_path, test_path, resfile_name,
         modfile = new_model_name
         clf = Hybrid(freq_threshold=2, pass_freq_to_vw=True, probability=False,
                      vw_args= vwargs, suffix=suffix, iterative=iterative,
-                     use_temp_files=True, vw_modelfile=modfile)
+                     use_temp_files=False, vw_modelfile=modfile)
     else:
         clf = pickle.load(open(initial_model, "rb"))
 
@@ -193,7 +193,7 @@ def iterative_experiment(train_path, test_path, resfile_name,
     print_results(resfile_name, outdir, result_type, iterative=True)
 
     # save model
-    save_name = clf.vw_modelfile[:-2] + 'p'
+    save_name = './iter_model.p'
     pickle.dump(clf, open(save_name, "wb" ))
 
 
@@ -209,7 +209,7 @@ def single_label_experiment(nfolds, tr_path, resfile_name, outdir, vwargs, resul
     suffix = 'single'
     clf = Hybrid(freq_threshold=2, pass_freq_to_vw=True, probability=False,
                  vw_args=vwargs, suffix=suffix, iterative=False,
-                 use_temp_files=True)
+                 use_temp_files=False)
     resfile = open(resfile_name, 'wb')
     results = []
     if(ts_path==None): # cross validation
@@ -320,17 +320,17 @@ def print_results(resfile, outdir, result_type='summary', n_strats=1, args=None,
     x = y_true
     y = y_pred
 
-    classifications.append(metrics.classification_report(x, y, labels))
-    f1_weighted.append(metrics.f1_score(x, y, labels, average='weighted'))
-    f1_micro.append(metrics.f1_score(x, y, labels, average='micro'))
-    f1_macro.append(metrics.f1_score(x, y, labels, average='macro'))
-    p_weighted.append(metrics.precision_score(x, y, labels, average='weighted'))
-    p_micro.append(metrics.precision_score(x, y, labels, average='micro'))
-    p_macro.append(metrics.precision_score(x, y, labels, average='macro'))
-    r_weighted.append(metrics.recall_score(x, y, labels, average='weighted'))
-    r_micro.append(metrics.recall_score(x, y, labels, average='micro'))
-    r_macro.append(metrics.recall_score(x, y, labels, average='macro'))
-    confusions.append(metrics.confusion_matrix(x, y, labels))
+    classifications.append(metrics.classification_report(x, y, labels=labels))
+    f1_weighted.append(metrics.f1_score(x, y, labels=labels, average='weighted'))
+    f1_micro.append(metrics.f1_score(x, y, labels=labels, average='micro'))
+    f1_macro.append(metrics.f1_score(x, y, labels=labels, average='macro'))
+    p_weighted.append(metrics.precision_score(x, y, labels=labels, average='weighted'))
+    p_micro.append(metrics.precision_score(x, y, labels=labels, average='micro'))
+    p_macro.append(metrics.precision_score(x, y, labels=labels, average='macro'))
+    r_weighted.append(metrics.recall_score(x, y, labels=labels, average='weighted'))
+    r_micro.append(metrics.recall_score(x, y, labels=labels, average='micro'))
+    r_macro.append(metrics.recall_score(x, y, labels=labels, average='macro'))
+    confusions.append(metrics.confusion_matrix(x, y, labels=labels))
     label_counts.append(len(set(x)))
 
     # this for loop will only run once
@@ -405,7 +405,7 @@ def multi_label_experiment(nfolds, tr_path, resfile_name, outdir, vwargs, result
     """
     suffix = 'multi'
     clf = Hybrid(freq_threshold=2, pass_freq_to_vw=True, probability=True,
-                 vw_args=vwargs, suffix=suffix, use_temp_files=True)
+                 vw_args=vwargs, suffix=suffix, use_temp_files=False)
 
     resfile = open(resfile_name, 'wb')
     results = []
@@ -456,8 +456,9 @@ def get_multilabel_scores(clf, train_tags, train_labels, test_tags, test_labels)
             the classifier
     """
     clf.fit(train_tags, train_labels)
-    ntags = [len(y) if isinstance(y, list) else 1 for y in test_labels]
-    preds = clf.top_k_tags(test_tags, ntags)
+    preds = clf.cost_density(test_tags, test_labels)
+    # ntags = [len(y) if isinstance(y, list) else 1 for y in test_labels]
+    # preds = clf.top_k_tags(test_tags, test_labels, ntags)
     return test_labels, preds
 
 def print_multilabel_results(resfile, outdir, result_type, args=None, n_strats=1, summary=False):
@@ -542,7 +543,7 @@ if __name__ == '__main__':
     # run a single label experiment by default, if --multi flag is added, run a multilabel experiment!
     parser.add_argument('-m','--multi', dest='experiment', action='store_const', const='multi',
                         default='single', help="Type of experiment to run (single-label default).")
-    parser.add_argument('-w','--vwargs', dest='vw_args', default='-b 26 --learning_rate 1.5 --passes 10',
+    parser.add_argument('-w','--vwargs', dest='vw_args', default=' -b 26 --learning_rate 1.5 --passes 30',
                         help="custom arguments for VW.")
     parser.add_argument('-n', '--nfolds', help='number of folds to use in cross validation', default=1) # make default 1?
     parser.add_argument('-f', '--fullres', help='generate full result file.', dest='result',

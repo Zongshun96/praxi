@@ -116,3 +116,4 @@ container*/
 a.cache
 version_detection/
 # user requested caches/
+demos/ic2e_demo/demo_tagsets/
