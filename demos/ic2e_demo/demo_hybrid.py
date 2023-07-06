@@ -279,11 +279,13 @@ class Hybrid(BaseEstimator):
         
         
         # =====================================
-        # # Simple thresholding all_probas_sigmoid
+        # # Simple thresholding all_probas_sigmoid (-csoaa)
+        # p < 0.99
         # F1 SCORE : 0.263 weighted
         # PRECISION: 0.169 weighted
         # RECALL   : 0.648 weighted
         # =====================================
+        # set_th = 0.2
         # for proba in all_probas_sigmoid:
         #     tag_list = list(proba.keys())
         #     proba_array = list(proba.values())
@@ -293,86 +295,93 @@ class Hybrid(BaseEstimator):
         #             cur_top_k.append(self.reverse_labels[int(tag_list[idx])])
         #     result.append(cur_top_k)
 
-        # for proba in probas:
-        #     tag_list = list(proba.keys())
-        #     proba_array = list(proba.values())
-        #     cur_top_k = []
-        #     for idx, p in enumerate(proba_array):
-        #         if p < 0.99:
-        #             cur_top_k.append(self.reverse_labels[int(tag_list[idx])])
-        #     result.append(cur_top_k)
-        
 
         # =====================================
-        # # find the biggest clustering.
-        # -------------------------------------
-        # model = DBSCAN(eps=0.30, min_samples=1)
-        # F1 SCORE : 0.237 weighted
-        # PRECISION: 0.144 weighted
-        # RECALL   : 0.902 weighted
-        # -------------------------------------
-        # model = DBSCAN(eps=0.40, min_samples=1)
-        # F1 SCORE : 0.269 weighted
-        # PRECISION: 0.167 weighted
-        # RECALL   : 0.854 weighted
-        # -------------------------------------
-        # model = DBSCAN(eps=0.50, min_samples=1)
-        # F1 SCORE : 0.300 weighted
-        # PRECISION: 0.192 weighted
-        # RECALL   : 0.820 weighted
-        # -------------------------------------
-        # model = DBSCAN(eps=0.80, min_samples=1)
-        # F1 SCORE : 0.329 weighted
-        # PRECISION: 0.222 weighted
-        # RECALL   : 0.723 weighted
+        # # Simple thresholding all_probas (-multilabels_oaa)
         # =====================================
-        clustering_model_name = "DBSCAN"
-        model = DBSCAN(eps=0.0001, min_samples=1)
+        set_th = 0.5
         for input_idx, proba in enumerate(probas):
             tag_list = list(proba.keys())
-            proba_array = np.array(list(proba.values())).reshape(-1,1)
-            yhats = model.fit_predict(proba_array)
-            clusters = set(yhats)
-            # if len(clusters == 1) and proba_array[0] < 10:
-            #     result = [self.reverse_labels[tag] for tag in tag_list]
-            # elif len(clusters == 1) and proba_array[0] > 10:
-            #     result = []
-            # else:
-            if True:
-                cur_top_k = []
-                # # tag = min(yhat)
-                # yhats_counter = Counter(yhats)
+            proba_array = list(proba.values())
+            yhats = []
+            cur_top_k = []
+            for idx, p in enumerate(proba_array):
+                if p > set_th:
+                    yhats.append(0)
+                    cur_top_k.append(self.reverse_labels[int(tag_list[idx])])
+                else:
+                    yhats.append(-1)
+            result.append(cur_top_k)
+            fig, ax = plt.subplots(1, 1, figsize=(26, 6), dpi=600)
+            proba_array = proba_array
+            c_l = [color_l[cluster_idx] for cluster_idx in yhats]
+            bar_plots = ax.bar(list(range(len(proba_array))), proba_array, color=c_l)
+            ax.set_xlim(-2, len(proba_array)+1)
+            ax.set_xticks(list(range(len(proba_array))))
+            ax.set_xticklabels([self.reverse_labels[int(tag_list[idx])]+"*" if self.reverse_labels[int(tag_list[idx])] in y[input_idx] else self.reverse_labels[int(tag_list[idx])] for idx in range(len(yhats))], rotation=90)
+            # ax.set_title('Probability Plot', fontdict={'fontsize': 30, 'fontweight': 'medium'})
+            ax.set_xlabel("label idx", fontdict={'fontsize': 26})
+            ax.set_ylabel("Probability", fontdict={'fontsize': 26})
+            ax.tick_params(axis='both', which='major', labelsize=12)
+            ax.tick_params(axis='both', which='minor', labelsize=10)
+            ax.bar_label(bar_plots, labels=yhats, fontsize=10)
+            ax.hlines(y=set_th, xmin=0, xmax=len(proba_array), color='black')
+            plt.savefig('./results/figs/threshold_'+str(set_th)+'_proba_'+str(input_idx)+'.png', bbox_inches='tight')
+            plt.close()
 
-                biggest_clusters_idx = max(clusters)
-                count = -1
-                for i in range(biggest_clusters_idx, -1, -1):
-                    count_i = sum(yhats[yhats == i])
-                    if count_i > count:
-                        count = count_i
-                        biggest_clusters_idx = i
+        
 
-                for biggest_yhat_idx, yhat in enumerate(yhats):
-                    if yhat == biggest_clusters_idx:
-                        break
-                    cur_top_k.append(self.reverse_labels[int(tag_list[biggest_yhat_idx])])
-                result.append(cur_top_k)
-        # else:
-                fig, ax = plt.subplots(1, 1, figsize=(26, 6), dpi=600)
-                proba_array = proba_array.reshape(-1)
-                c_l = [color_l[cluster_idx] for cluster_idx in yhats]
-                bar_plots = ax.bar(list(range(len(proba_array))), proba_array, color=c_l)
-                ax.set_xlim(-2, len(proba_array)+1)
-                ax.set_xticks(list(range(len(proba_array))))
-                ax.set_xticklabels([self.reverse_labels[int(tag_list[idx])]+"*" if self.reverse_labels[int(tag_list[idx])] in y[input_idx] else self.reverse_labels[int(tag_list[idx])] for idx in range(len(yhats))], rotation=90)
-                # ax.set_title('Probability Plot', fontdict={'fontsize': 30, 'fontweight': 'medium'})
-                ax.set_xlabel("label idx", fontdict={'fontsize': 26})
-                ax.set_ylabel("Probability", fontdict={'fontsize': 26})
-                ax.tick_params(axis='both', which='major', labelsize=12)
-                ax.tick_params(axis='both', which='minor', labelsize=10)
-                ax.bar_label(bar_plots, labels=yhats, fontsize=10)
-                ax.vlines(x=biggest_yhat_idx-0.5, ymin=min(proba_array), ymax=max(proba_array), color='black')
-                plt.savefig('./results/figs/'+clustering_model_name+'_proba_'+str(input_idx)+'.png', bbox_inches='tight')
-                plt.close()
+        # # =====================================
+        # # # find the biggest output prob clustering (-multilabels_oaa)(-csoaa)
+        # # =====================================
+        # clustering_model_name = "DBSCAN"
+        # set_eps = 0.5
+        # model = DBSCAN(eps=set_eps, min_samples=1)
+        # for input_idx, proba in enumerate(probas):
+        #     tag_list = list(proba.keys())
+        #     proba_array = np.array(list(proba.values())).reshape(-1,1)
+        #     yhats = model.fit_predict(proba_array)
+        #     clusters = set(yhats)
+        #     # if len(clusters == 1) and proba_array[0] < 10:
+        #     #     result = [self.reverse_labels[tag] for tag in tag_list]
+        #     # elif len(clusters == 1) and proba_array[0] > 10:
+        #     #     result = []
+        #     # else:
+        #     if True:
+        #         cur_top_k = []
+        #         # # tag = min(yhat)
+        #         # yhats_counter = Counter(yhats)
+
+        #         biggest_clusters_idx = max(clusters)
+        #         count = -1
+        #         for i in range(biggest_clusters_idx, -1, -1):
+        #             count_i = sum(yhats[yhats == i])
+        #             if count_i > count:
+        #                 count = count_i
+        #                 biggest_clusters_idx = i
+
+        #         for biggest_yhat_idx, yhat in enumerate(yhats):
+        #             if yhat == biggest_clusters_idx:
+        #                 break
+        #             cur_top_k.append(self.reverse_labels[int(tag_list[biggest_yhat_idx])])
+        #         result.append(cur_top_k)
+        # # else:
+        #         fig, ax = plt.subplots(1, 1, figsize=(26, 6), dpi=600)
+        #         proba_array = proba_array.reshape(-1)
+        #         c_l = [color_l[cluster_idx] for cluster_idx in yhats]
+        #         bar_plots = ax.bar(list(range(len(proba_array))), proba_array, color=c_l)
+        #         ax.set_xlim(-2, len(proba_array)+1)
+        #         ax.set_xticks(list(range(len(proba_array))))
+        #         ax.set_xticklabels([self.reverse_labels[int(tag_list[idx])]+"*" if self.reverse_labels[int(tag_list[idx])] in y[input_idx] else self.reverse_labels[int(tag_list[idx])] for idx in range(len(yhats))], rotation=90)
+        #         # ax.set_title('Probability Plot', fontdict={'fontsize': 30, 'fontweight': 'medium'})
+        #         ax.set_xlabel("label idx", fontdict={'fontsize': 26})
+        #         ax.set_ylabel("Probability", fontdict={'fontsize': 26})
+        #         ax.tick_params(axis='both', which='major', labelsize=12)
+        #         ax.tick_params(axis='both', which='minor', labelsize=10)
+        #         ax.bar_label(bar_plots, labels=yhats, fontsize=10)
+        #         ax.vlines(x=biggest_yhat_idx-0.5, ymin=min(proba_array), ymax=max(proba_array), color='black')
+        #         plt.savefig('./results/figs/'+clustering_model_name+'_eps_'+str(set_eps)+'_proba_'+str(input_idx)+'.png', bbox_inches='tight')
+        #         plt.close()
 
 
 

@@ -117,3 +117,5 @@ a.cache
 version_detection/
 # user requested caches/
 demos/ic2e_demo/demo_tagsets/
+demos/ic2e_demo/*_results/
+demos/ic2e_demo/summary/
