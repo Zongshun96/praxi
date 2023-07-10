@@ -1,0 +1,33 @@
+id: []
+labels:
+- deap
+tags:
+- init.:3
+- gp.cpython-39.pyc.14008336:2
+- gp.:6
+- migration.:3
+- test:44
+- test_init.:3
+- test_:21
+- cma.:3
+- constraint.:3
+- __init__.:11
+- algorithms.:3
+- movingpeaks.:3
+- test_creator.:3
+- test_logbook.:3
+- indicator.:3
+- binary.:3
+- test_algorithms.:3
+- test_pickle.:3
+- test_benchmarks.:3
+- support.:3
+- emo.:3
+- tools.:3
+- test_statistics.:3
+- base.:3
+- mutation.:3
+- crossover.:3
+- pyhv.:3
+- creator.:3
+- selection.:3

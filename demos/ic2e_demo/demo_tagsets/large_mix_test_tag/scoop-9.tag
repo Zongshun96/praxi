@@ -1,0 +1,31 @@
+id: []
+labels:
+- scoop
+tags:
+- scoop:100
+- _co:14
+- scoopexceptions.:3
+- __main__.cpython-39.pyc.14009077067:2
+- __main__.cpython-39.pyc.1400907706:3
+- __main__.cpython-39.pyc.140090770:4
+- __main__.:12
+- _types.:3
+- futures.:3
+- broker:23
+- structs.:3
+- minusconf.:3
+- _control.:3
+- brokertcp.:3
+- utils.:3
+- brokerLaunch.:3
+- brokerzmq.:3
+- launcher.:3
+- scoopzmq.:3
+- __init__.:13
+- constants.:3
+- _debug.:3
+- fallbacks.:3
+- workerLaunch.:3
+- scooptcp.:3
+- shared.:3
+- encapsulation.:3

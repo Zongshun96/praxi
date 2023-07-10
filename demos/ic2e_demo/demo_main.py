@@ -432,20 +432,26 @@ def multi_label_experiment(nfolds, tr_path, resfile_name, outdir, vwargs, result
         train_tags, train_labels = parse_ts(ts_train_names, ts_train_path)
         test_tags, test_labels = parse_ts(ts_test_names, ts_test_path)
 
-        labels, preds = get_multilabel_scores(clf, train_tags, train_labels, test_tags, test_labels)
-        results.append((labels, preds))
+        labels, preds_d, params = get_multilabel_scores(clf, train_tags, train_labels, test_tags, test_labels)
+        results.append((labels, preds_d, params))
         # might not work
         if print_misses:
             print("Misclassified labels:")
-            for label, pred in zip(labels, preds):
-                if set(label) != set(pred):
-                    improper_preds = [i for i in pred if i not in label]
-                    labels_missed = [i for i in label if i not in pred]
-                    print('label:',labels_missed,'prediction:',improper_preds)
+            for param, preds in preds_d.items():
+                print("now we print pred result with param="+str(param))
+                for label, pred in zip(labels, preds):
+                    if set(label) != set(pred):
+                        improper_preds = [i for i in pred if i not in label]
+                        labels_missed = [i for i in label if i not in pred]
+                        print('label:',labels_missed,'prediction:',improper_preds)
 
     pickle.dump(results, resfile)
     resfile.close()
     print_multilabel_results(resfile_name, outdir, result_type, args=clf.get_args(), n_strats=1)
+
+    # save model
+    save_name = './results/pred_model.p'
+    pickle.dump(clf, open(save_name, "wb" ))
 
 
 def get_multilabel_scores(clf, train_tags, train_labels, test_tags, test_labels):
@@ -456,10 +462,10 @@ def get_multilabel_scores(clf, train_tags, train_labels, test_tags, test_labels)
             the classifier
     """
     clf.fit(train_tags, train_labels)
-    preds = clf.cost_density(test_tags, test_labels)
+    preds_d, params = clf.cost_density(test_tags, test_labels)
     # ntags = [len(y) if isinstance(y, list) else 1 for y in test_labels]
     # preds = clf.top_k_tags(test_tags, test_labels, ntags)
-    return test_labels, preds
+    return test_labels, preds_d, params
 
 def print_multilabel_results(resfile, outdir, result_type, args=None, n_strats=1, summary=False):
     """ Calculate result statistics and print them to result file
@@ -471,66 +477,74 @@ def print_multilabel_results(resfile, outdir, result_type, args=None, n_strats=1
     with open(resfile, 'rb') as f:
         results = pickle.load(f)
     numfolds = len(results)
-    y_true = []
-    y_pred = []
+    y_true_labels = []
+    y_pred_d_l = []
+    params = []
     for result in results:
-        y_true += result[0]
-        y_pred += result[1]
+        y_true_labels.extend(result[0])
+        y_pred_d_l.append(result[1])
+        params.extend(result[2])
 
     bnz = MultiLabelBinarizer()
-    bnz.fit(y_true)
-    all_tags = copy.deepcopy(y_true)
-    for preds in y_pred:
-        for label in preds:
-            if label not in bnz.classes_:
-                all_tags.append([label])
-                bnz.fit(all_tags)
-    y_true = bnz.transform(y_true)
-    y_pred = bnz.transform(y_pred)
+    bnz.fit(y_true_labels)
+    all_tags = copy.deepcopy(y_true_labels)
 
-    labels = bnz.classes_
-    report = metrics.classification_report(y_true, y_pred, target_names=labels)
-    f1w = metrics.f1_score(y_true, y_pred, average='weighted')
-    f1i = metrics.f1_score(y_true, y_pred, average='micro')
-    f1a = metrics.f1_score(y_true, y_pred, average='macro')
-    pw = metrics.precision_score(y_true, y_pred, average='weighted')
-    pi = metrics.precision_score(y_true, y_pred, average='micro')
-    pa = metrics.precision_score(y_true, y_pred, average='macro')
-    rw = metrics.recall_score(y_true, y_pred, average='weighted')
-    ri = metrics.recall_score(y_true, y_pred, average='micro')
-    ra = metrics.recall_score(y_true, y_pred, average='macro')
+    f1w_l = []
+    for y_pred_d in y_pred_d_l:
+        for param, y_pred in y_pred_d.items():
+            y_true = copy.deepcopy(y_true_labels)
+            for preds in y_pred:
+                for label in preds:
+                    if label not in bnz.classes_:
+                        all_tags.append([label])
+                        bnz.fit(all_tags)
+            y_true = bnz.transform(y_true)
+            y_pred = bnz.transform(y_pred)
 
-    os.makedirs(str(outdir), exist_ok=True)
+            labels = bnz.classes_
+            report = metrics.classification_report(y_true, y_pred, target_names=labels)
+            f1w = metrics.f1_score(y_true, y_pred, average='weighted')
+            f1w_l.append(f1w)
+            f1i = metrics.f1_score(y_true, y_pred, average='micro')
+            f1a = metrics.f1_score(y_true, y_pred, average='macro')
+            pw = metrics.precision_score(y_true, y_pred, average='weighted')
+            pi = metrics.precision_score(y_true, y_pred, average='micro')
+            pa = metrics.precision_score(y_true, y_pred, average='macro')
+            rw = metrics.recall_score(y_true, y_pred, average='weighted')
+            ri = metrics.recall_score(y_true, y_pred, average='micro')
+            ra = metrics.recall_score(y_true, y_pred, average='macro')
 
-    if numfolds == 1:
-        file_header = ("MULTILABEL EXPERIMENT REPORT\n" +
-            time.strftime("Generated %c\n") +
-            ('\nArgs: {}\n\n'.format(args) if args else '') +
-            "EXPERIMENT WITH {} TEST CHANGESETS\n".format(len(y_true)))
-        fstub = 'multi_exp'
-    else:
-        file_header = ("MULTILABEL EXPERIMENT REPORT\n" +
-            time.strftime("Generated %c\n") +
-            ('\nArgs: {}\n'.format(args) if args else '') +
-            "\n{} FOLD CROSS VALIDATION WITH {} CHANGESETS\n".format(numfolds, len(y_true)))
-        fstub = 'multi_exp_cv'
+            os.makedirs(str(outdir), exist_ok=True)
 
-    if result_type == 'summary':
-        file_header += ("F1 SCORE : {:.3f} weighted\n".format(f1w) +
-            "PRECISION: {:.3f} weighted\n".format(pw) +
-            "RECALL   : {:.3f} weighted\n".format(rw))
-        fstub += '_summary'
-    else:
-        file_header += ("F1 SCORE : {:.3f} weighted, {:.3f} micro-avg'd, {:.3f} macro-avg'd\n".format(f1w, f1i, f1a) +
-            "PRECISION: {:.3f} weighted, {:.3f} micro-avg'd, {:.3f} macro-avg'd\n".format(pw, pi, pa) +
-            "RECALL   : {:.3f} weighted, {:.3f} micro-avg'd, {:.3f} macro-avg'd\n\n".format(rw, ri, ra))
-        file_header += (" {:-^55}\n".format("CLASSIFICATION REPORT") + report.replace('\n', "\n"))
-    fname = get_free_filename(fstub, outdir, '.txt')
+            if numfolds == 1:
+                file_header = ("MULTILABEL EXPERIMENT REPORT\n" +
+                    time.strftime("Generated %c\n") +
+                    ('\nArgs: {}\n\n'.format(args) if args else '') +
+                    "EXPERIMENT WITH {} TEST CHANGESETS\n".format(len(y_true)))
+                fstub = 'multi_exp'
+            else:
+                file_header = ("MULTILABEL EXPERIMENT REPORT\n" +
+                    time.strftime("Generated %c\n") +
+                    ('\nArgs: {}\n'.format(args) if args else '') +
+                    "\n{} FOLD CROSS VALIDATION WITH {} CHANGESETS\n".format(numfolds, len(y_true)))
+                fstub = 'multi_exp_cv'
+
+            if result_type == 'summary':
+                file_header += ("F1 SCORE : {:.3f} weighted\n".format(f1w) +
+                    "PRECISION: {:.3f} weighted\n".format(pw) +
+                    "RECALL   : {:.3f} weighted\n".format(rw))
+                fstub += '_summary'
+            else:
+                file_header += ("F1 SCORE : {:.3f} weighted, {:.3f} micro-avg'd, {:.3f} macro-avg'd\n".format(f1w, f1i, f1a) +
+                    "PRECISION: {:.3f} weighted, {:.3f} micro-avg'd, {:.3f} macro-avg'd\n".format(pw, pi, pa) +
+                    "RECALL   : {:.3f} weighted, {:.3f} micro-avg'd, {:.3f} macro-avg'd\n\n".format(rw, ri, ra))
+                file_header += (" {:-^55}\n".format("CLASSIFICATION REPORT") + report.replace('\n', "\n"))
+            fname = get_free_filename(fstub+"_param_"+str(param), outdir, '.txt')
 
 
-    savetxt("{}".format(fname),
-            np.array([]), fmt='%d', header=file_header, delimiter=',',
-            comments='')
+            savetxt("{}".format(fname),
+                    np.array([]), fmt='%d', header=file_header, delimiter=',',
+                    comments='')
 
 
 if __name__ == '__main__':

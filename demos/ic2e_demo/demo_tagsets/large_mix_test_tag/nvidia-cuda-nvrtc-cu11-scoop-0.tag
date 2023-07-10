@@ -1,0 +1,34 @@
+id: []
+labels:
+- nvidia-cuda-nvrtc-cu11
+- scoop
+tags:
+- scoop:97
+- shared.:3
+- __main__.:11
+- _co:13
+- scoopzmq.:3
+- __main__.cpython-39.pyc.140629027:3
+- _debug.:3
+- utils.:3
+- INSTALLER:4
+- __init__.:21
+- RECORD:4
+- broker:24
+- structs.:3
+- futures.:3
+- constants.:3
+- minusconf.:3
+- scooptcp.:3
+- brokertcp.:3
+- workerLaunch.:3
+- brokerLaunch.:3
+- fallbacks.:3
+- _types.:3
+- libnvrtc:2
+- brokerzmq.:3
+- scoopexceptions.:2
+- launcher.:3
+- _control.:3
+- encapsulation.:3
+- __main__.cpython-39.pyc.140629027777:2

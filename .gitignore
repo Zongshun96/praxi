@@ -105,7 +105,7 @@ ENV/
 
 # Miscellaneous
 week*/
-results/
+# results/
 caches/
 a.cache
 changeset_sets/
@@ -116,6 +116,7 @@ container*/
 a.cache
 version_detection/
 # user requested caches/
-demos/ic2e_demo/demo_tagsets/
-demos/ic2e_demo/*_results/
+# demos/ic2e_demo/demo_tagsets/
+# demos/ic2e_demo/*_results/
 demos/ic2e_demo/summary/
+demos/ic2e_demo/86labels_1070sets-86labels-238sets/

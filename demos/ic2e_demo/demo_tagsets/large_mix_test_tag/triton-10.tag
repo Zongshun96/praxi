@@ -1,0 +1,29 @@
+id: []
+labels:
+- triton
+tags:
+- compiler.:3
+- random.:3
+- semantic.:3
+- base.:3
+- matmul.cpython-39.pyc.139697060706:2
+- matmul.:6
+- matmul:9
+- aot.:3
+- extern.:3
+- build_extern.:3
+- matmul_perf_model.:3
+- libdevice.:4
+- lib:5
+- autotuner.:3
+- disasm.:3
+- utils.:3
+- core.:3
+- __init__.:17
+- jit.:3
+- softmax.:3
+- testing.:3
+- cross_entropy.:3
+- __init__.cpython-39.pyc.139697061:2
+- __init__.cpython-39.pyc.13969706:3
+- flash_attention.:3

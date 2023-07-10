@@ -1,0 +1,35 @@
+id: []
+labels:
+- nvidia-cuda-nvrtc-cu11
+- wheel
+tags:
+- wheel:87
+- vendor:41
+- pack:40
+- _parser.:3
+- requirements.:3
+- macosx_libfile.:3
+- metadata.:3
+- _musllinux.:3
+- _setuptools_logging.:2
+- utils.:3
+- libnvrtc:2
+- __init__.:16
+- _manylinux.:3
+- tags.cpython-39.pyc.14062434:2
+- tags.:6
+- _tokenizer.:3
+- specifiers.:3
+- INSTALLER:4
+- convert.:3
+- _elffile.:2
+- _structures.:3
+- RECORD:4
+- wheelfile.:3
+- pack.:3
+- version.:3
+- unpack.:3
+- __main__.:2
+- markers.:3
+- util.:3
+- bdist_wheel.:3

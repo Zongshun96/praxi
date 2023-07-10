@@ -1,0 +1,54 @@
+MULTILABEL EXPERIMENT REPORT
+Generated Mon Jul 10 20:36:15 2023
+
+Args:  -b 26 --learning_rate 1.5 --passes 30 --csoaa 35 --kill_cache --cache_file a.cache
+
+EXPERIMENT WITH 164 TEST CHANGESETS
+F1 SCORE : 0.284 weighted, 0.139 micro-avg'd, 0.118 macro-avg'd
+PRECISION: 0.176 weighted, 0.075 micro-avg'd, 0.070 macro-avg'd
+RECALL   : 0.904 weighted, 0.904 micro-avg'd, 0.914 macro-avg'd
+
+ -----------------CLASSIFICATION REPORT-----------------
+                          precision    recall  f1-score   support
+
+              SQLAlchemy       0.02      1.00      0.04         2
+                  Scrapy       0.02      1.00      0.04         2
+                  Theano       0.02      1.00      0.04         2
+                 astropy       0.02      1.00      0.04         2
+          beautifulsoup4       0.02      1.00      0.04         2
+               biopython       0.02      1.00      0.04         2
+                   bokeh       0.02      1.00      0.04         2
+                   boto3       0.24      0.83      0.38        30
+                   cmake       0.27      0.87      0.41        31
+                    dask       0.02      1.00      0.04         2
+                    deap       0.02      1.00      0.04         2
+                  jinja2       0.20      0.90      0.32        21
+              matplotlib       0.21      0.73      0.33        30
+                networkx       0.00      0.00      0.00         0
+                 nilearn       0.02      1.00      0.04         2
+  nvidia-cuda-nvrtc-cu11       0.21      0.90      0.34        21
+nvidia-cuda-runtime-cu11       0.02      1.00      0.04         2
+           opencv-python       0.02      1.00      0.04         2
+                  pandas       0.20      1.00      0.33        26
+                  pillow       0.05      1.00      0.10         5
+                  plotly       0.02      1.00      0.04         2
+                 pycaret       0.02      1.00      0.04         2
+                 pyspark       0.02      1.00      0.04         2
+                   redis       0.02      1.00      0.04         2
+                requests       0.02      1.00      0.04         2
+            scikit-image       0.00      0.00      0.00         0
+            scikit-learn       0.02      1.00      0.04         2
+                   scipy       0.18      1.00      0.31        22
+                   scoop       0.02      1.00      0.05         2
+              simplejson       0.02      1.00      0.04         2
+                     six       0.02      1.00      0.04         2
+             statsmodels       0.02      1.00      0.04         2
+                  triton       0.17      0.85      0.28        20
+           triton==2.0.0       0.02      1.00      0.04         2
+                   wheel       0.18      0.89      0.30        19
+
+               micro avg       0.08      0.90      0.14       271
+               macro avg       0.07      0.91      0.12       271
+            weighted avg       0.18      0.90      0.28       271
+             samples avg       0.36      0.93      0.38       271
+

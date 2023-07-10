@@ -1,0 +1,32 @@
+id: []
+labels:
+- triton==2.0.0
+- six
+tags:
+- matmul.cpython-39.pyc.13987796935:2
+- matmul.:6
+- matmul:9
+- six.:3
+- six:12
+- core.:3
+- RECORD:4
+- flash_attention.:3
+- disasm.:3
+- compiler.:3
+- INSTALLER:4
+- __init__.:15
+- random.:3
+- cross_entropy.:3
+- utils.:3
+- lib:5
+- jit.:3
+- libdevice.:4
+- semantic.:3
+- aot.:3
+- autotuner.:3
+- build_extern.:3
+- testing.:3
+- extern.:3
+- softmax.:3
+- base.:3
+- matmul_perf_model.:3

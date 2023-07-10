@@ -1,0 +1,32 @@
+id: []
+labels:
+- wheel
+tags:
+- wheel:92
+- _setuptools_logging.:3
+- pack.:3
+- pack:41
+- vendor:42
+- requirements.:3
+- markers.:3
+- _elffile.:3
+- specifiers.:3
+- __init__.:10
+- _manylinux.:3
+- version.:3
+- unpack.:3
+- _parser.:3
+- macosx_libfile.:3
+- utils.:3
+- convert.:3
+- tags.:6
+- wheelfile.:3
+- _structures.:3
+- bdist_wheel.:3
+- util.:3
+- __main__.:3
+- metadata.:3
+- _tokenizer.:3
+- __init__.cpython-39.pyc.139934465:2
+- tags.cpython-39.pyc.139934465:2
+- _musllinux.:3

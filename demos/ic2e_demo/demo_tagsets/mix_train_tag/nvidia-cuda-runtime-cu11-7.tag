@@ -1,0 +1,34 @@
+id: []
+labels:
+- nvidia-cuda-runtime-cu11
+tags:
+- cuda_runtime:107
+- cuda_:126
+- cuda:136
+- device_:6
+- cuda_fp:4
+- sm_20_:4
+- sm_:16
+- cl_e:2
+- cl_:5
+- sm_3:8
+- __init__.:8
+- lib:3
+- sm_35_:2
+- texture_:3
+- vector_:3
+- driver_:3
+- surface_:3
+- cudaGL:2
+- cudaEGL:2
+- math_:2
+- cuda_awbarrier_:2
+- cuda_awbarrier:3
+- sm_32_:4
+- cuda_pipeline_:2
+- cuda_pipeline:3
+- cudaVDPAU:2
+- coalesced_:2
+- cl_gl:2
+- sm_6:4
+- host_:2
