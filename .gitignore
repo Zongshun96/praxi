@@ -116,3 +116,9 @@ container*/
 a.cache
 version_detection/
 # user requested caches/
+demos/ic2e_demo/iter_model.p
+demos/ic2e_demo/iter_model.vw
+demos/ic2e_demo/demo_tagsets/new_tagsets/
+demos/ic2e_demo/demo_tagsets/mix_test_tag/
+demos/ic2e_demo/results_init/
+demos/ic2e_demo/results_iter/

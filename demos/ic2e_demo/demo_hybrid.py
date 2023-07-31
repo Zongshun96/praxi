@@ -19,7 +19,7 @@ LOCK = Lock()
 
 class Hybrid(BaseEstimator):
     """ scikit style class for hybrid method """
-    def __init__(self, freq_threshold=1, vw_binary='/home/ubuntu/bin/vw',
+    def __init__(self, freq_threshold=1, vw_binary='/usr/bin/vw',
                  pass_freq_to_vw=False, pass_files_to_vw=False,
                  vw_args='-b 26 --passes=20 -l 50',
                  probability=False, tqdm=True,
@@ -107,14 +107,16 @@ class Hybrid(BaseEstimator):
         ################################################
         ## Create VW arg string ########################
         if self.probability:
-            self.vw_args_ += ' --csoaa {}'.format(len(self.all_labels))
+            if not self.trained:
+                self.vw_args_ += ' --csoaa {}'.format(len(self.all_labels))
         else:
             self.vw_args_ += ' --probabilities'
             self.loss_function = 'logistic'
             self.vw_args_ += ' --loss_function={}'.format(self.loss_function)
-            if self.iterative:
+            if self.iterative and not self.trained:
                 self.vw_args_ += ' --oaa 80'
-            else:
+            elif not self.iterative:
+            # else:
                 self.vw_args_ += ' --oaa {}'.format(len(self.all_labels))
         if self.iterative:
             self.vw_args_ += ' --save_resume'
@@ -124,9 +126,9 @@ class Hybrid(BaseEstimator):
         if self.use_temp_files:
             f = tempfile.NamedTemporaryFile('w', delete=False)
         else:
-            with open('./label_table-%s.yaml' % self.suffix, 'w') as f:
+            with open('./results/label_table-%s.yaml' % self.suffix, 'w') as f:
                 yaml.dump(self.reverse_labels, f)
-            f = open('./fit_input-%s.txt' % self.suffix, 'w')
+            f = open('./results/fit_input-%s.txt' % self.suffix, 'w')
         for tag, labels in train_set:
             if isinstance(labels, str):
                 labels = [labels]
@@ -184,8 +186,8 @@ class Hybrid(BaseEstimator):
             outf = outfobj.name
             outfobj.close()
         else:
-            f = open('./pred_input-%s.txt' % self.suffix, 'w')
-            outf = './pred_output-%s.txt' % self.suffix
+            f = open('./results/pred_input-%s.txt' % self.suffix, 'w')
+            outf = './results/pred_output-%s.txt' % self.suffix
         if self.probability:
             for tag in X:
                 f.write('{} | {}\n'.format(
@@ -237,9 +239,11 @@ class Hybrid(BaseEstimator):
                number of labels expected for each
         output: list of lists containing the predicted labels for each tagset
         """
+        f = open('./results/pred_ntag-%s.txt' % self.suffix, 'w')
         probas = self.predict_proba(X)
         result = []
         for ntag, proba in zip(ntags, probas):
+            f.write(str(ntag)+"\n")
             cur_top_k = []
             for i in range(ntag):
                 if self.probability:
@@ -249,6 +253,7 @@ class Hybrid(BaseEstimator):
                 proba.pop(tag)
                 cur_top_k.append(self.reverse_labels[int(tag)])
             result.append(cur_top_k)
+        f.close()
         return result
 
     def predict(self, X):
@@ -265,8 +270,8 @@ class Hybrid(BaseEstimator):
             outf = outfobj.name
             outfobj.close()
         else:
-            f = open('./pred_input-%s.txt' % self.suffix, 'w')
-            outf = './pred_output-%s.txt' % self.suffix
+            f = open('./results/pred_input-%s.txt' % self.suffix, 'w')
+            outf = './results/pred_output-%s.txt' % self.suffix
         for tag in X:
             f.write('| {}\n'.format(' '.join(tag)))
         f.close()
