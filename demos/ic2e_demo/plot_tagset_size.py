@@ -20,9 +20,10 @@ def plot_size():
     # # for length in range(1, len(packages_l)+1):
     # for length in range(1, 2):
     #     for package_names in combinations(packages_l, length):
+    target_dir = "large_mix_test_tag"
     dirname = os.path.dirname(__file__)
     # out_dirname = dirname
-    out_dirname = dirname+"/demo_tagsets/mix_train_tag/"
+    out_dirname = dirname+"/demo_tagsets/"+target_dir+"/"
     # print(out_dirname)
     tagsets_l = [name for name in os.listdir(out_dirname) if os.path.isfile(out_dirname+name)]
     # print(tagsets_l)
@@ -33,10 +34,11 @@ def plot_size():
             try:
                 tagset = yaml.safe_load(stream)
                 if 'labels' in tagset:
-                    if tagset['labels'][0] in p_size_d:
-                        p_size_d[tagset['labels'][0]].append(len(tagset["tags"]))
+                    labels_str = '&&'.join(tagset['labels'])
+                    if labels_str in p_size_d:
+                        p_size_d[labels_str].append(len(tagset["tags"]))
                     else:
-                        p_size_d[tagset['labels'][0]] = [len(tagset["tags"])]
+                        p_size_d[labels_str] = [len(tagset["tags"])]
                 else:
                     if tagset['label'] in p_size_d:
                         p_size_d[tagset['label']].append(len(tagset["tags"]))
@@ -45,7 +47,7 @@ def plot_size():
             except yaml.YAMLError as exc:
                 print(exc)
 
-
+    p_size_d = {k: v for k, v in sorted(p_size_d.items(), key=lambda item: statistics.mean(item[1]))}
     fig, ax = plt.subplots(1, 1, figsize=(26, 6), dpi=600)
     # proba_array = proba_array.reshape(-1)
     # c_l = [color_l[cluster_idx] for cluster_idx in yhats]
@@ -55,12 +57,12 @@ def plot_size():
     ax.set_xticklabels(list(p_size_d.keys()), rotation=90)
     # ax.set_title('Probability Plot', fontdict={'fontsize': 30, 'fontweight': 'medium'})
     ax.set_xlabel("label idx", fontdict={'fontsize': 26})
-    ax.set_ylabel("Tags Count", fontdict={'fontsize': 26})
+    ax.set_ylabel("Tagset Size", fontdict={'fontsize': 26})
     ax.tick_params(axis='both', which='major', labelsize=12)
     ax.tick_params(axis='both', which='minor', labelsize=10)
     # ax.bar_label(bar_plots, labels=yhats, fontsize=10)
     # ax.vlines(x=biggest_yhat_idx-0.5, ymin=min(proba_array), ymax=max(proba_array), color='black')
-    plt.savefig('./results/tagset_sizes.png', bbox_inches='tight')
+    plt.savefig('/home/cc/Praxi-study/praxi/demos/ic2e_demo/results/'+target_dir+'_tagset_sizes.png', bbox_inches='tight')
     plt.close()
     return
 

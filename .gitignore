@@ -120,3 +120,7 @@ version_detection/
 # demos/ic2e_demo/*_results/
 demos/ic2e_demo/summary/
 demos/ic2e_demo/86labels_1070sets-86labels-238sets/
+demos/ic2e_demo/35labels_322sets-35labels_1175sets/
+demos/ic2e_demo/35labels_322sets-35labels_164sets/
+demos/ic2e_demo/results/
+demos/ic2e_demo/results-buggy/
