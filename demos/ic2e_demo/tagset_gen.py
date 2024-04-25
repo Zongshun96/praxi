@@ -24,7 +24,8 @@ import os
 from os import listdir
 from os.path import isfile, join, isabs
 import sys
-sys.path.insert(0, '../')
+# sys.path.insert(0, '../')
+sys.path.insert(0, '/home/cc/praxi/')
 
 from pathlib import Path
 import time
@@ -72,7 +73,7 @@ def get_changeset(cs_fname, cs_dir):
         if changeset is not None:
             raise IOError("Too many changesets match the file name")
         with csfile.open('r') as f:
-            changeset = yaml.load(f)
+            changeset = yaml.load(f, Loader=yaml.Loader)
     if changeset is None:
         logging.error("No changesets match the name %s", str(csfile))
         raise IOError("No changesets match the name")
@@ -82,7 +83,7 @@ def get_changeset(cs_fname, cs_dir):
     return changeset
 
 def get_columbus_tags(X, disable_tqdm=False, return_freq=True,
-                       freq_threshold=2):
+                       freq_threshold=1):
     """ Function that gets the columbus tags for a given list of filesystem
         changes
     input: a list of filesystem changes

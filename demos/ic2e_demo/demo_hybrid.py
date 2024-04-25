@@ -19,7 +19,7 @@ LOCK = Lock()
 
 class Hybrid(BaseEstimator):
     """ scikit style class for hybrid method """
-    def __init__(self, freq_threshold=1, vw_binary='/home/ubuntu/bin/vw',
+    def __init__(self, freq_threshold=1, vw_binary='/usr/bin/vw',
                  pass_freq_to_vw=False, pass_files_to_vw=False,
                  vw_args='-b 26 --passes=20 -l 50',
                  probability=False, tqdm=True,
@@ -107,7 +107,8 @@ class Hybrid(BaseEstimator):
         ################################################
         ## Create VW arg string ########################
         if self.probability:
-            self.vw_args_ += ' --csoaa {}'.format(len(self.all_labels))
+            print(f"not reset --csoaa")
+            # self.vw_args_ += ' --csoaa {}'.format(len(self.all_labels))
         else:
             self.vw_args_ += ' --probabilities'
             self.loss_function = 'logistic'
@@ -269,6 +270,14 @@ class Hybrid(BaseEstimator):
             outf = './pred_output-%s.txt' % self.suffix
         for tag in X:
             f.write('| {}\n'.format(' '.join(tag)))
+        # for tag in X:
+        #     input_string = ''
+        #     if self.probability:
+        #         for label, number in self.indexed_labels.items():
+        #             input_string += '{} '.format(number)
+        #         f.write('{}| {}\n'.format(input_string, ' '.join(tag)))
+        #     else:
+        #         f.write('| {}\n'.format(' '.join(tag)))
         f.close()
         #logging.info('vw input written to %s, starting testing', f.name)
         command = '{vw_binary} {vw_input} -t -p {outf} -i {vw_modelfile}'.format(

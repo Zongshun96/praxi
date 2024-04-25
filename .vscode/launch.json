@@ -1,0 +1,52 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Python Debugger: First Train",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/demos/ic2e_demo",
+            "args": [
+                "-t",
+                "demo_tagsets/iter_init",
+                "-s",
+                "demo_tagsets/sl_test_tag",
+                "-o",
+                "results",
+                "-i",
+                "iter_model.vw",
+                "-l"
+            ]
+        },
+        {
+            "name": "Python Debugger: Incremental Train",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/demos/ic2e_demo",
+            "args": [
+                "-t",
+                "demo_tagsets/iter_init",
+                "-s",
+                "demo_tagsets/sl_test_tag",
+                "-o",
+                "results",
+                "-p",
+                "iter_model.p"
+            ]
+        }
+    ]
+}

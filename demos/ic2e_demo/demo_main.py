@@ -67,10 +67,10 @@ def parse_ts(tagset_names, ts_dir):
     for ts_name in tqdm(tagset_names):
             ts_path = ts_dir + '/' + ts_name
             with open(ts_path, 'r') as stream:
-                tagset = yaml.load(stream)
+                tagset = yaml.load(stream, Loader=yaml.Loader)
             if 'labels' in tagset:
                 # Multilabel changeset
-                labels.append(tagset['labels'])
+                labels.extend(tagset['labels'])
             else:
                 labels.append(tagset['label'])
             tags.append(tagset['tags'])
@@ -157,9 +157,10 @@ def iterative_experiment(train_path, test_path, resfile_name,
         modfile = new_model_name
         clf = Hybrid(freq_threshold=2, pass_freq_to_vw=True, probability=False,
                      vw_args= vwargs, suffix=suffix, iterative=iterative,
-                     use_temp_files=True, vw_modelfile=modfile)
+                     use_temp_files=False, vw_modelfile=modfile)
     else:
         clf = pickle.load(open(initial_model, "rb"))
+        clf.vw_args = "--learning_rate 1.5 --passes 10"
 
     train_names = [f for f in listdir(train_path) if (isfile(join(train_path, f))and f[-3:]=='tag')]
     if(len(train_names) == 0):
@@ -320,17 +321,17 @@ def print_results(resfile, outdir, result_type='summary', n_strats=1, args=None,
     x = y_true
     y = y_pred
 
-    classifications.append(metrics.classification_report(x, y, labels))
-    f1_weighted.append(metrics.f1_score(x, y, labels, average='weighted'))
-    f1_micro.append(metrics.f1_score(x, y, labels, average='micro'))
-    f1_macro.append(metrics.f1_score(x, y, labels, average='macro'))
-    p_weighted.append(metrics.precision_score(x, y, labels, average='weighted'))
-    p_micro.append(metrics.precision_score(x, y, labels, average='micro'))
-    p_macro.append(metrics.precision_score(x, y, labels, average='macro'))
-    r_weighted.append(metrics.recall_score(x, y, labels, average='weighted'))
-    r_micro.append(metrics.recall_score(x, y, labels, average='micro'))
-    r_macro.append(metrics.recall_score(x, y, labels, average='macro'))
-    confusions.append(metrics.confusion_matrix(x, y, labels))
+    classifications.append(metrics.classification_report(x, y, labels=labels))
+    f1_weighted.append(metrics.f1_score(x, y, labels=labels, average='weighted'))
+    f1_micro.append(metrics.f1_score(x, y, labels=labels, average='micro'))
+    f1_macro.append(metrics.f1_score(x, y, labels=labels, average='macro'))
+    p_weighted.append(metrics.precision_score(x, y, labels=labels, average='weighted'))
+    p_micro.append(metrics.precision_score(x, y, labels=labels, average='micro'))
+    p_macro.append(metrics.precision_score(x, y, labels=labels, average='macro'))
+    r_weighted.append(metrics.recall_score(x, y, labels=labels, average='weighted'))
+    r_micro.append(metrics.recall_score(x, y, labels=labels, average='micro'))
+    r_macro.append(metrics.recall_score(x, y, labels=labels, average='macro'))
+    confusions.append(metrics.confusion_matrix(x, y, labels=labels))
     label_counts.append(len(set(x)))
 
     # this for loop will only run once
